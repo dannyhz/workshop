@@ -6,4 +6,9 @@ public class TestUpdate {
 		System.out.println("today is happy");
 	}
 
+	
+	public void getUserName(){
+		System.out.println("user name is danny");
+	}
+	
 }
