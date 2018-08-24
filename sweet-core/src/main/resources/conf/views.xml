@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans classpath:xsd/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/mvc classpath:xsd/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/context classpath:xsd/spring-context-4.1.xsd">
+	
+	<!-- 启用bean的${}功能 -->
+	<context:property-placeholder location="classpath*:conf/*-config.properties" /> 
+	
+	<!-- 静态资源处理方案:其会注册一个SimpleUrlHandlerMapping，并交由ResourceHttpRequestHandler处理请求资源 -->
+	<mvc:resources mapping="/resources/**" location="/" order="1">
+	    <!-- 以下的cache属性结合会自动配置CachingResourceResolver/Transformer，缺省使用ConcurrentMapCache -->
+	    <!-- 以下的auto-registration属性默认为true，会生成CssLinkResourceTransformer、PathResourceResolver -->
+	    <mvc:resource-chain auto-registration="false" resource-cache="true" cache-manager="cacheManager" cache-name="cache_resource">
+	        <mvc:resolvers>
+	            <bean class="org.springframework.web.servlet.resource.GzipResourceResolver"/> 
+	            <mvc:version-resolver>
+					<!-- FixedVersionStrategy可以使用某项属性,或者日期,或者其它来作为版本; {version}/path/foo.js-->
+					<!-- ContentVersionStrategy是使用资源内容计算出来的MD5哈希作为版本;  path/foo-{version}.css -->
+					<!-- ContentVersionStrategy某些情况下不能使用,比如,带有javascript模块加截器进行依赖管理.  -->
+					<!-- <mvc:content-version-strategy  patterns="/**"/> 为angular而放弃该策略-->
+	                <mvc:fixed-version-strategy patterns="/**" version="${app.version}"/> 	                
+	            </mvc:version-resolver>
+	            <bean class="org.springframework.web.servlet.resource.PathResourceResolver">  
+		            <property name="allowedLocations">  
+ 		                <list><!-- 允许下列location的资源可以访问 -->
+			                <value>/vendor</value><value>/views</value><value>/css</value><value>/images</value><value>/js</value>
+			                <value>/js/base</value><value>/css/base</value><value>/css/fonts</value>  
+			            </list>    
+		            </property>  
+		        </bean>   
+	        </mvc:resolvers>
+	        <mvc:transformers>   
+		        <bean class="cn.evun.sweet.core.spring.NoCtxPathCssLinkResourceTransformer">
+					<property name="ignoreCssFiles">  
+			             <list>
+			             	<value>font-awesome.min.css</value><value>font-simple-line.css</value><value>toaster.css</value>
+			             	<value>font.css</value><value>bootstrap.min.css</value><value>footable.core.css</value><value>chosen.css</value>
+			             </list>    
+			        </property>  
+				</bean> 
+		    </mvc:transformers>
+	    </mvc:resource-chain>		 
+	</mvc:resources> 
+	
+		
+	<!-- 配置mvc各工作单元 -->
+	<mvc:annotation-driven validator="validator" ignore-default-model-on-redirect="true">  
+	    <!--覆盖RequestMappingHandlerAdapter的messageConverters配置  -->
+        <mvc:message-converters> 
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">     
+	            <property name="supportedMediaTypes">  
+	                <list><value>text/html;charset=UTF-8</value><value>text/plain;charset=UTF-8</value></list>
+	            </property>  
+	        </bean>  
+	        <bean class="cn.evun.sweet.core.web.FastJsonHttpMessageConverter">
+		    	<property name="supportedMediaTypes">  
+		            <list>  
+		                <value>application/json;charset=UTF-8</value>  
+		                <value>text/html;charset=UTF-8</value><!-- 避免IE出现下载JSON文件的情况 -->  
+		            </list>  
+		        </property>
+				<property name="writeNullValue" value="${fastjson.writeNullValue:false}" />
+		        <property name="features">  
+		            <list>  
+		                <value>QuoteFieldNames</value>
+ 		                <!--<value>WriteDateUseDateFormat</value>  由view端根据需要格式化 -->
+		            </list>  
+		        </property>  
+		    </bean>     
+        </mvc:message-converters> 
+        <mvc:async-support task-executor="asyncRequestThreadPool" default-timeout="120000">
+        	<mvc:callable-interceptors>  
+                <bean class="cn.evun.sweet.core.spring.CustomCallableProcessingInterceptor" />  
+            </mvc:callable-interceptors>  
+            <mvc:deferred-result-interceptors>  
+                <bean class="cn.evun.sweet.core.spring.CustomResultProcessingInterceptor" />  
+            </mvc:deferred-result-interceptors>  
+        </mvc:async-support>  
+    </mvc:annotation-driven> 
+       
+    <!-- 处理异步请求的线程池，替换默认的SimpleAsyncTaskExecutor -->
+    <bean id="asyncRequestThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">  
+        <property name="corePoolSize" value="${asyncrequest.threadpool.corepoolsize}"/><!--最小线程数 -->  
+        <property name="maxPoolSize" value="${asyncrequest.threadpool.maxpoolsize}"/><!--最大线程数 -->  
+        <property name="queueCapacity" value="${asyncrequest.threadpool.queuecapacity}"/><!--任务缓冲队列大小 -->  
+        <property name="threadNamePrefix" value="async_request_"/><!--线程池中产生的线程名字前缀 -->  
+        <property name="keepAliveSeconds" value="${asyncrequest.threadpool.keepaliveseconds}"/><!--线程池中空闲线程的存活时间单位秒 -->  
+    </bean> 
+    
+    <!-- 配置后端校验器 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">  
+	    <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>  
+	    <!-- 默认使用classpath下的 ValidationMessages.properties -->  
+	    <property name="validationMessageSource" ref="messageSource"/>  
+	</bean> 
+	
+	<!-- 取代annotation-driven的默认handlerMapping。 -->
+	<bean name="handlerMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"> 
+	    <!-- 从父（根）上下文寻找Bean, 使得Controller的扫描配置不需要一定写在view配置中 -->
+	    <property name="detectHandlerMethodsInAncestorContexts" value="true" />
+	    <property name="interceptors">     
+     		<list>
+				<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+				<bean class="cn.evun.sweet.core.validation.TokenInterceptor" />
+			</list>     
+ 		</property> 
+ 		<property name="order" value="-1" />
+	</bean>
+
+	<!-- 视图配置 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="100" /><!-- 保证其最后执行 -->
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"><!-- 针对诸如excel、pdf等特殊视图 -->
+		<property name="order" value="1" />
+    </bean>
+    <!-- JSON视图 -->
+	<bean id="jsonView" class="com.alibaba.fastjson.support.spring.FastJsonJsonView"/>
+	<!-- Easypoi对应的视图 -->
+    <bean id="jeecgExcelView" class="org.jeecgframework.poi.excel.view.JeecgSingleExcelView" />
+    <bean id="jeecgTemplateExcelView" class="org.jeecgframework.poi.excel.view.JeecgTemplateExcelView" />
+    <bean id="jeecgTemplateWordView" class="org.jeecgframework.poi.excel.view.JeecgTemplateWordView" />
+    <bean id="jeecgMapExcelView" class="org.jeecgframework.poi.excel.view.JeecgMapExcelView" />
+		
+	<!-- mvc全局异常处理  -->
+	<bean class="cn.evun.sweet.core.spring.ResponseBodyHandlerExceptionResolver"><!--支持@ExceptionHandler并扩展@ResponseBody-->	    
+	    <property name="order" value="-2" />
+	</bean>  
+	<bean class="cn.evun.sweet.core.spring.NoajaxMappingExceptionResolver"><!--主要处理非ajax方式请求-->
+	    <property name="order" value="-1" />
+		<property name="defaultErrorView" value="common/error" />
+	</bean>
+
+	<!-- 文件上传 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+
+	<import resource="classpath*:conf/**/*-view.xml" />
+
+</beans>

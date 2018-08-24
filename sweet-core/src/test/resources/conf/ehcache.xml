@@ -1,0 +1,18 @@
+<eh:config
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:eh='http://www.ehcache.org/v3'
+    xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+    xsi:schemaLocation="
+        http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.1.xsd
+        http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.1.xsd">
+
+	<eh:cache alias="cache_ehcache"> <!-- cache_main -->
+		<eh:key-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:key-type>
+		<eh:value-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:value-type>
+		<eh:resources>
+			<eh:heap unit="MB">100</eh:heap>
+			<eh:offheap unit="MB">128</eh:offheap>
+		</eh:resources>
+	</eh:cache>
+	
+</eh:config>

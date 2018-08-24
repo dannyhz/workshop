@@ -1,0 +1,665 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.workshop</groupId>
+	<artifactId>workshop-parent</artifactId>
+	<version>1.1.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<description>用于项目继承及统一管理</description>
+
+	<modules>
+		<module>../sweet-auth</module>
+		<module>../sweet-core</module>
+		<module>../sweet-common</module>
+	</modules>
+
+	<properties>
+		<sweet.version>1.1.1-SNAPSHOT</sweet.version>
+		<sourceEncoding>UTF-8</sourceEncoding>
+		<java-version>1.8</java-version>
+		<servlet.version>3.1.0</servlet.version>
+		<jsp.version>2.1</jsp.version>
+		<spring.version>4.1.2.RELEASE</spring.version>
+		<slf4j.version>1.7.7</slf4j.version>
+		<log4j.version>2.7</log4j.version>
+		<log4jdbc.version>1.2</log4jdbc.version>
+		<tomcat.jdbc>7.0.47</tomcat.jdbc>
+		<ehcache.version>3.1.1</ehcache.version>
+		<mybatis.version>3.2.8</mybatis.version>
+		<mybatis.spring.version>1.2.2</mybatis.spring.version>
+		<oss.version>2.3.0</oss.version>
+		<spring.redis.version>1.7.5.RELEASE</spring.redis.version>
+		<jedis.version>2.8.1</jedis.version>
+		<junit.version>4.12</junit.version>
+		<fst.version>2.45</fst.version>
+		<mongo-java-driver.version>2.14.3</mongo-java-driver.version>
+		<spring-mongodb.version>1.7.2.RELEASE</spring-mongodb.version>
+		<ons-client.version>1.7.0.Final</ons-client.version>
+		<spring-batch.version>3.0.7.RELEASE</spring-batch.version>
+	</properties>
+
+	<build>
+		<resources>	<!-- 定义profile文件中placeholders替换范围 -->
+			<resource>
+				<directory>src/main/java</directory>
+				<includes><include>**/*.*</include></includes>
+				<excludes><exclude>**/*.java</exclude></excludes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes><include>**/*.*</include></includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins> <!-- 基础插件定义 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+					<encoding>${sourceEncoding}</encoding>
+				</configuration>
+				<version>2.3.2</version>
+			</plugin>
+		</plugins>
+		<pluginManagement><!-- 基础插件申明 -->
+			<plugins>
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.1.1</version><!-- 2.4的filter不起作用 -->
+				</plugin>
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.4.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.3.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.4.3</version>
+					<configuration>
+						<encoding>${sourceEncoding}</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.7.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.0.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>people.apache.snapshots</id>
+			<url>http://repository.apache.org/content/groups/snapshots-group/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
+		<repository>
+	        <id>spring-milestones</id>
+	        <name>Spring Milestones</name>
+	        <url>https://repo.spring.io/libs-milestone</url> 
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </repository>
+	    <repository>
+		 	<id>people.aliyun.snapshots</id>
+		 	<url> http://maven.aliyun.com/nexus/content/groups/public</url>
+		 	<releases><enabled>false</enabled></releases>
+		 	<snapshots><enabled>true</enabled></snapshots>
+		 </repository>
+		<!--
+		<repository>	
+			<id>local.jar</id>	
+			<name>core</name>	
+			<url>file://${project.basedir}/lib</url>	 引用本地的fastdfs-client.jar 
+		</repository> 
+		-->
+	    <repository>
+			<id>people.nexus.snapshots</id>
+			<url>http://nexus.jycdev.cn/nexus/content/groups/public</url>
+			<releases><enabled>true</enabled></releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>apache.snapshots</id>
+			<name>Apache Snapshots</name>
+			<url>http://repository.apache.org/content/groups/snapshots-group/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<id>nexus-release</id>
+			<name>Team Nexus Release Repository</name>
+			<url>http://nexus.jycdev.cn/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>Team Nexus Snapshot Repository</name>
+			<url>http://nexus.jycdev.cn/nexus/content/repositories/snapshots</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
+	
+	<dependencyManagement>
+		<dependencies>
+			<!-- sweet模块包 -->
+			<dependency>
+				<groupId>com.workshop</groupId>
+				<artifactId>workshop-core</artifactId>
+				<version>${sweet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.workshop</groupId>
+				<artifactId>workshop-common</artifactId>
+				<version>${sweet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.workshop</groupId>
+				<artifactId>workshop-auth</artifactId>
+				<version>${sweet.version}</version>
+			</dependency>
+
+			<!-- org.springframework 全配置 -->
+			<!-- Core utilities used by other modules. Define this if you use Spring 
+				Utility APIs (org.springframework.core.*/org.springframework.util.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring.version}</version>
+				<exclusions><!--将spring日志门面切换到slf4j，解开其对commons-logging依赖 -->
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- Expression Language (depends on spring-core) Define this if you use 
+				Spring Expression APIs (org.springframework.expression.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Bean Factory and JavaBeans utilities (depends on spring-core) Define 
+				this if you use Spring Bean APIs (org.springframework.beans.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Aspect Oriented Programming (AOP) Framework (depends on spring-core, 
+				spring-beans) Define this if you use Spring AOP APIs (org.springframework.aop.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- spring整合了aspectjrt.jar，也可以使用aspectjrt.jar来代替 -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aspects</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Application Context (depends on spring-core, spring-expression, spring-aop, 
+				spring-beans) This is the central artifact for Spring's Dependency Injection 
+				Container and is generally always defined -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Various Application Context utilities, including EhCache, JavaMail, 
+				Quartz, and Freemarker integration Define this if you need any of these integrations -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Transaction Management Abstraction (depends on spring-core, spring-beans, 
+				spring-aop, spring-context) Define this if you use Spring Transactions or 
+				DAO Exception Hierarchy (org.springframework.transaction.*/org.springframework.dao.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- JDBC Data Access Library (depends on spring-core, spring-beans, spring-context, 
+				spring-tx) Define this if you use Spring's JdbcTemplate API (org.springframework.jdbc.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Object-to-Relation-Mapping (ORM) integration with Hibernate, JPA, 
+				and iBatis. (depends on spring-core, spring-beans, spring-context, spring-tx) 
+				Define this if you need ORM (org.springframework.orm.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Object-to-XML Mapping (OXM) abstraction and integration with JAXB, 
+				JiBX, Castor, XStream, and XML Beans. (depends on spring-core, spring-beans, 
+				spring-context) Define this if you need OXM (org.springframework.oxm.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-oxm</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Web application development utilities applicable to both Servlet 
+				and Portlet Environments (depends on spring-core, spring-beans, spring-context) 
+				Define this if you use Spring MVC, or wish to use Struts, JSF, or another 
+				web framework with Spring (org.springframework.web.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Spring MVC for Servlet Environments (depends on spring-core, spring-beans, 
+				spring-context, spring-web) Define this if you use Spring MVC with a Servlet 
+				Container such as Apache Tomcat (org.springframework.web.servlet.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Spring MVC for Portlet Environments (depends on spring-core, spring-beans, 
+				spring-context, spring-web) Define this if you use Spring MVC with a Portlet 
+				Container (org.springframework.web.portlet.*) -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc-portlet</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Support for testing Spring applications with tools such as JUnit 
+				and TestNG This artifact is generally always defined with a 'test' scope 
+				for the integration testing framework and unit testing stubs -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- spring projects -->
+            <dependency>
+                <groupId>org.springframework.batch</groupId>
+                <artifactId>spring-batch-core</artifactId>
+                <version>${spring-batch.version}</version>
+            </dependency>
+            <dependency>
+				<groupId>org.springframework.batch</groupId>
+				<artifactId>spring-batch-infrastructure</artifactId>
+				<version>${spring-batch.version}</version>
+			</dependency>
+            <dependency>
+                <groupId>org.springframework.batch</groupId>
+                <artifactId>spring-batch-test</artifactId>
+                <version>${spring-batch.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- spring dependencies -->
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjweaver</artifactId>
+				<version>1.6.12</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>1.3.1</version>
+			</dependency>
+			<dependency>  
+		        <groupId>org.hibernate</groupId>  
+		        <artifactId>hibernate-validator</artifactId>  
+		        <version>5.0.2.Final</version>  
+		    </dependency>
+
+			<!-- javax.servlet -->
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${servlet.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet.jsp</groupId>
+				<artifactId>jsp-api</artifactId>
+				<version>${jsp.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
+			</dependency>
+
+			<!-- logging -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId><!--让 commons-logging能转发到 slf4j-->
+				<version>${slf4j.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId><!--让slf4j能转发到 log4j2-->
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-web</artifactId>
+				<version>${log4j.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.googlecode.log4jdbc</groupId>
+				<artifactId>log4jdbc</artifactId><!-- sql语句填充 -->
+				<version>${log4jdbc.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-nosql</artifactId>
+                <version>${log4j.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+			<dependency> <!-- log4j2输出到gelf -->
+				<groupId>cn.jyc.log4j2</groupId>
+				<artifactId>log4j2-gelf</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+
+			<!-- json -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>1.1.44</version>
+			</dependency>
+
+			<!-- apache commons -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.3.2</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.10</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>1.9.2</version>
+				<exclusions><!--解开其对commons-logging依赖 -->
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			
+			<!-- cglib component -->
+			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib</artifactId>
+				<version>3.1</version>
+			</dependency>
+
+			<!-- mybatis3 -->
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis</artifactId>
+				<version>${mybatis.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis-spring</artifactId>
+				<version>${mybatis.spring.version}</version>
+			</dependency>
+			<dependency>
+			  	<groupId>tk.mybatis</groupId>
+			  	<artifactId>mapper</artifactId>
+			  	<version>3.3.9</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jsqlparser</groupId>
+				<artifactId>jsqlparser</artifactId>
+				<version>0.9.1</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.persistence</groupId>
+				<artifactId>persistence-api</artifactId>
+				<version>1.0</version>
+			</dependency>
+
+			<!-- 数据库连接池 -->
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-jdbc</artifactId>
+				<version>${tomcat.jdbc}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-catalina</artifactId>
+				<version>7.0.47</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- 1D/2D picture -->
+			<dependency>
+				<groupId>com.google.zxing</groupId>
+				<artifactId>core</artifactId>
+				<version>2.2</version>
+			</dependency>
+			
+			<!-- POI操作工具http://git.oschina.net/jueyue/easypoi -->
+			<dependency>
+				<groupId>org.jeecg</groupId>
+				<artifactId>easypoi-base</artifactId>
+				<version>2.3.0.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jeecg</groupId>
+				<artifactId>easypoi-web</artifactId>
+				<version>2.3.0.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jeecg</groupId>
+				<artifactId>easypoi-annotation</artifactId>
+				<version>2.3.0.1</version>
+			</dependency>
+
+			<!-- 压缩功能类库 -->
+			<dependency>
+				<groupId>org.zeroturnaround</groupId>
+				<artifactId>zt-zip</artifactId>
+				<version>1.8</version>
+			</dependency>
+			
+			<!-- 文件存储阿里云OSS -->
+			<dependency>
+				<groupId>com.aliyun.oss</groupId>
+				<artifactId>aliyun-sdk-oss</artifactId>
+				<version>${oss.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.aliyun</groupId>
+				<artifactId>aliyun-java-sdk-sts</artifactId>
+				<version>2.1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.aliyun</groupId>
+				<artifactId>aliyun-java-sdk-core</artifactId>
+				<optional>true</optional>
+				<version>3.2.8</version>
+			</dependency>
+			<dependency>
+				<groupId>com.aliyun</groupId>
+				<artifactId>aliyun-java-sdk-ons</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			
+			<!--  Readis集成-->
+		    <dependency>
+		        <groupId>org.springframework.data</groupId>
+		        <artifactId>spring-data-redis</artifactId>
+		        <version>${spring.redis.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>spring-oxm</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+				</exclusions>
+		    </dependency>
+		    <dependency>
+			    <groupId>redis.clients</groupId>
+			    <artifactId>jedis</artifactId>
+			    <version>${jedis.version}</version>
+			</dependency>
+			<!-- cache component -->
+			<dependency>
+		     	<groupId>org.ehcache</groupId>
+		      	<artifactId>ehcache</artifactId>
+		      	<version>${ehcache.version}</version>
+		    </dependency>
+			
+			<dependency>
+			  <groupId>com.gexin.platform</groupId>
+			  <artifactId>gexin-rp-sdk-base</artifactId>
+			  <version>4.0.0.12</version>
+			</dependency>
+			<dependency>
+				<groupId>com.gexin.platform</groupId>
+				<artifactId>gexin-rp-sdk-http</artifactId>
+				<version>4.0.1.7</version>
+			</dependency>
+			<dependency>
+			   <groupId>com.gexin.platform</groupId>
+			   <artifactId>gexin-rp-sdk-template</artifactId>
+			   <version>4.0.0.6</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.google.protobuf</groupId>
+			  <artifactId>protobuf-java</artifactId>
+			  <version>2.5.0</version>
+			</dependency>
+            <!-- Junit 4 -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+			<!--fst用于序列化及反序列化 -->
+			<dependency>
+			  <groupId>de.ruedigermoeller</groupId>
+			  <artifactId>fst</artifactId>
+			  <version>${fst.version}</version>
+			</dependency>
+			<!--mongodb的java客户端和spring封装 -->
+			<dependency>
+			  <groupId>org.mongodb</groupId>
+              <artifactId>mongo-java-driver</artifactId>
+              <version>${mongo-java-driver.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.springframework.data</groupId>
+              <artifactId>spring-data-mongodb</artifactId>
+			  <version>${spring-mongodb.version}</version>
+			</dependency>
+			<!-- 消息队列ONS依赖 -->
+			<dependency>
+				<groupId>com.aliyun.openservices</groupId>
+				<artifactId>ons-client</artifactId>
+				<version>${ons-client.version}</version>
+			</dependency>
+			<!-- 引入 Netflix HysTrix -->
+			<dependency>
+				<groupId>cn.jyc.hystrix</groupId>
+				<artifactId>hystrix-javanica</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.netflix.hystrix</groupId>
+						<artifactId>hystrix-metrics-event-stream</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<!-- 引入httpclient 4.4.1 -->
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.4.1</version>
+			</dependency>
+			<!-- lombok插件 -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.16.18</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
